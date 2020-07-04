@@ -9,6 +9,7 @@ def load_shopkeep(fname):
 
     # Create a copy of the full dataframe
     copy_df = master_df.copy()
+    copy_df.index = copy_df['Item UUID']
 
     # replace nan option columns with empty string
     master_df['Option1 Value (Do Not Edit)'].replace(to_replace={np.nan: ''}, inplace=True)

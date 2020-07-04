@@ -24,8 +24,6 @@ replace_dict_noreg = {'MSRP': '', '(': ' ', ')': ' ',
 
 
 medusa_fname = 'medusa.pdf'
-
-
 shopkeep_fname = 'norwich_update_test.csv'
 
 copy_df, compare_values = load_shopkeep(shopkeep_fname)
@@ -47,6 +45,13 @@ for key, val in invoice_dict.items():
     else:
         best = fuzzed[0][0]
 
+    match_uuid = compare_values[compare_values == best].index.values[0]
+    update_df.loc[match_uuid, :] = copy_df.loc[match_uuid, :]
+    print(update_df)
+    update_df.loc[match_uuid, 'Quantity'] = copy_df.loc[match_uuid]['Quantity'].astype(int) + int(val)
+
     print(key)
     print(f'\t[+] Best Match: {best}', sep='\n')
     print('\n')
+
+print(update_df)

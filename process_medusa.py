@@ -1,12 +1,23 @@
 import tabula
 import pandas as pd
+from utils import replace_dict
 
+def add_mg(s):
+    last = s[-1]
+    try:
+        out = int(last)
+        mg_flag = True
+    except ValueError as e:
+        mg_flag = False
 
-replace_dict = {"custardmonstersalt": 'custard monster',
-                'custardmonster':'custard monster',
-                'vgodsalt': 'vgod'}
+    if mg_flag:
+        s += "mg"
+        return s
+    else:
+        return s
 
 def process_one_page_medusa(page, replace_dict):
+    '''Processes one page of the pdf file'''
 
     d2 = {
         r'(\b){}(\b)'.format(k):r'\1{}\2'.format(v) for k,v in replace_dict.items()}
@@ -30,8 +41,9 @@ def process_one_page_medusa(page, replace_dict):
         over['full'] = over['full'].str.replace('E-Liquid' , "Eliquid")
         over['full'] = over['full'].str.lower()
 
-
         over['full'] = over['full'].replace(d2, regex=True)
+
+        over['full'] = over['full'].apply(add_mg)
 
         over = over.iloc[::2, :]
         over = over.iloc[:-2, :]
@@ -71,13 +83,14 @@ def process_one_page_medusa(page, replace_dict):
 
         f = lambda x: " ".join(sorted(set(x), key=x.index))
         page['full'] = page['full'].apply(f)
+        page['full'] = page['full'].apply(add_mg)
 
         page.index = page['full']
 
         return page['Quantity']
 
 def process_medusa(fname):
-
+    '''returns the invoice_dict after processing all pages'''
     medusa = tabula.read_pdf(fname, pages='all')
 
 
